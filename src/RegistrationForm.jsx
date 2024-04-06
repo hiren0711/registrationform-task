@@ -1,209 +1,315 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import "./style.css";
 
-const RegistrationForm = () => {
-  // State variables for form fields and errors
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [retypePassword, setRetypePassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [town, setTown] = useState('');
-  const [region, setRegion] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [country, setCountry] = useState('');
+const useFormValidation = () => {
+  const [values, setValues] = useState({
+    email: "",
+    password: "",
+    retypePassword: "",
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    address: "",
+    town: "",
+    region: "",
+    zipCode: "",
+    country: "",
+  });
+
   const [errors, setErrors] = useState({});
 
-  // Function to validate form inputs
   const validate = () => {
     let errors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const usernameRegex = /^.{4,}$/;
+    const phoneNumberRegex = /^\d{10}$/;
+    const zipCodeRegex = /^\d{5}$/;
 
-    // Email validation
-    if (!email) {
-      errors.email = 'Email address is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.email = 'Invalid email address';
+    // Check if email is valid
+    if (!values.email || !emailRegex.test(values.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+    // Add validation for password
+    if (!values.password) {
+      errors.password = "Please enter a password";
+    }
+    // Add validation for retype password
+    if (values.password !== values.retypePassword) {
+      errors.retypePassword = "Passwords do not match";
+    }
+    // Check if username length is less than or equal to 4 characters
+    if (!values.firstName || !usernameRegex.test(values.firstName)) {
+      errors.firstName = "Username must be 4 characters or more";
+    }
+    // Add validation for lastname
+    if (!values.lastName) {
+      errors.lastName = "Please enter a lastName";
+    }
+    // Add validation for phoneNumber
+    if (!values.phoneNumber || !phoneNumberRegex.test(values.phoneNumber)) {
+      errors.phoneNumber = "Please enter a valid phone number (10 digits)";
+    }
+    // Add validation for address
+    if (!values.address) {
+      errors.address = "Please enter a address";
+    }
+    // Add validation for region
+    if (!values.region) {
+      errors.region = "Please enter a region";
+    }
+    // Add validation for zipCode
+    if (!values.zipCode || !zipCodeRegex.test(values.zipCode)) {
+      errors.zipCode = "Please enter a valid zip code (5 digits)";
+    }
+    // Check if country is selected
+    if (!values.country) {
+      errors.country = "Please select a country";
     }
 
-    // Password validation
-    if (!password) {
-      errors.password = 'Password is required';
-    }
-
-    // Retype password validation
-    if (password !== retypePassword) {
-      errors.retypePassword = 'Passwords do not match';
-    }
-
-    // First name validation
-    if (!firstName) {
-      errors.firstName = 'First name is required';
-     } else if (firstName.length > 4) {
-        errors.firstName = 'First name must be 4 characters or less';
-      }
-
-    // Last name validation
-    if (!lastName) {
-      errors.lastName = 'Last name is required';
-    } else if (lastName.length > 4) {
-        errors.lastName = 'Last name must be 4 characters or less';
-      }
-
-    // Phone number validation
-    if (!phoneNumber) {
-      errors.phoneNumber = 'Phone number is required';
-    } else if (!/^\d{10}$/.test(phoneNumber)) {
-      errors.phoneNumber = 'Invalid phone number';
-    }
-
-    // Town validation
-    if (!town) {
-      errors.town = 'Town is required';
-    }
-
-    // Region validation
-    if (!region) {
-      errors.region = 'Region is required';
-    }
-
-    // Zip code validation
-    if (!zipCode) {
-      errors.zipCode = 'Zip code is required';
-    }
-
-    // Country validation
-    if (!country) {
-      errors.country = 'Country is required';
-    }
-
-    return errors;
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  // Function to handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length === 0) {
-      // Form submission logic here
-      console.log('Form submitted successfully!');
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const isValid = validate();
+    if (isValid) {
+      console.log("Form submitted successfully!");
+      alert("Form submitted successfully!");
+      setValues({
+        email: "",
+        password: "",
+        retypePassword: "",
+        firstName: "",
+        lastName: "",
+        phoneNumber: "",
+        address: "",
+        town: "",
+        region: "",
+        zipCode: "",
+        country: "",
+      });
+      // Add your further logic here, like API calls or state updates
     } else {
-      setErrors(validationErrors);
+      console.log("Form has errors. Please correct them.");
     }
   };
+
+  const handleChange = (event) => {
+    setValues({
+      ...values,
+      [event.target.id]: event.target.value,
+    });
+  };
+
+  return { handleChange, handleSubmit, values, errors };
+};
+
+const RegistrationForm = () => {
+  const { handleChange, handleSubmit, values, errors } = useFormValidation();
 
   return (
     <div>
-      <h2>Register Here</h2>
-      <h3>User Registration *</h3>
-      <p><span  style={{ color: 'red' }}>*</span>  marked fields are required</p>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          {errors.email && <p>{errors.email}</p>}
-        </div>
-        <div>
-          <label htmlFor="password">Password <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {errors.password && <p>{errors.password}</p>}
-        </div>
-        <div>
-          <label htmlFor="retypePassword">Retype Password <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="password"
-            id="retypePassword"
-            value={retypePassword}
-            onChange={(e) => setRetypePassword(e.target.value)}
-          />
-          {errors.retypePassword && <p>{errors.retypePassword}</p>}
-        </div>
-        <div>
-          <label htmlFor="firstName">First Name <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="text"
-            id="firstName"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-          {errors.firstName && <p>{errors.firstName}</p>}
-        </div>
-        <div>
-          <label htmlFor="lastName">Last Name <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="text"
-            id="lastName"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-          {errors.lastName && <p>{errors.lastName}</p>}
-        </div>
-        <div>
-          <label htmlFor="phoneNumber">Phone Number <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="text"
-            id="phoneNumber"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          {errors.phoneNumber && <p>{errors.phoneNumber}</p>}
-        </div>
-        <div>
-          <label htmlFor="town">Town <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="text"
-            id="town"
-            value={town}
-            onChange={(e) => setTown(e.target.value)}
-          />
-          {errors.town && <p>{errors.town}</p>}
-        </div>
-        <div>
-          <label htmlFor="region">Region <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="text"
-            id="region"
-            value={region}
-            onChange={(e) => setRegion(e.target.value)}
-          />
-          {errors.region && <p>{errors.region}</p>}
-        </div>
-        <div>
-          <label htmlFor="zipCode">Zip Code <span  style={{ color: 'red' }}>*</span>:</label>
-          <input
-            type="text"
-            id="zipCode"
-            value={zipCode}
-            onChange={(e) => setZipCode(e.target.value)}
-          />
-          {errors.zipCode && <p>{errors.zipCode}</p>}
-        </div>
-        <div>
-          <label htmlFor="country">Country <span  style={{ color: 'red' }}>*</span>:</label>
-          <select
-            id="country"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-          >
-            <option value="">Select Country</option>
-            <option value="US">United States</option>
-            <option value="UK">United Kingdom</option>
-            <option value="CA">Canada</option>
-            {/* Add more countries as needed */}
-          </select>
-          {errors.country && <p>{errors.country}</p>}
-        </div>
-        <button type="submit">Submit</button>
-      </form>
+      <div className="registration-container">
+        <p className="grey">Register Here</p>
+        <h2 className="dgrey">USER REGISTRATION </h2>
+        <p className="grey">
+          {" "}
+          Fields marked <span style={{ color: "red" }}>*</span> are required
+        </p>
+        <form onSubmit={handleSubmit}>
+          {/* Email section */}
+          <div className="form-group">
+            <label htmlFor="email">
+              Email <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={values.email}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.email && <p className="error-message">{errors.email}</p>}
+            </span>
+          </div>
+
+          {/* password section */}
+          <div className="form-group">
+            <label htmlFor="password">
+              Password <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={values.password}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.password && (
+                <p className="error-message">{errors.password}</p>
+              )}
+            </span>
+          </div>
+
+          {/* retypepassword section */}
+          <div className="form-group">
+            <label htmlFor="retypePassword">
+              Retype Password <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="password"
+              id="retypePassword"
+              value={values.retypePassword}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.retypePassword && (
+                <p className="error-message">{errors.retypePassword}</p>
+              )}
+            </span>
+          </div>
+
+          {/* firstname section */}
+          <div className="form-group">
+            <label htmlFor="firstName">
+              First Name <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              value={values.firstName}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.firstName && (
+                <p className="error-message">{errors.firstName}</p>
+              )}
+            </span>
+          </div>
+
+          {/* lastname section */}
+          <div className="form-group">
+            <label htmlFor="lastName">
+              Last Name <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              value={values.lastName}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.lastName && (
+                <p className="error-message">{errors.lastName}</p>
+              )}
+            </span>
+          </div>
+
+          {/* phonenumber section */}
+          <div className="form-group">
+            <label htmlFor="phoneNumber">
+              Phone Number <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="number"
+              id="phoneNumber"
+              value={values.phoneNumber}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.phoneNumber && (
+                <p className="error-message">{errors.phoneNumber}</p>
+              )}
+            </span>
+          </div>
+
+          {/* address section */}
+          <div className="form-group">
+            <label htmlFor="address">
+              Address <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="text"
+              id="address"
+              value={values.address}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.address && (
+                <p className="error-message">{errors.address}</p>
+              )}
+            </span>
+          </div>
+
+          {/* town section */}
+          <div className="form-group">
+            <label htmlFor="town">Town</label>
+            <input
+              type="text"
+              id="town"
+              value={values.town}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* region section */}
+          <div className="form-group">
+            <label htmlFor="region">
+              Region <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="text"
+              id="region"
+              value={values.region}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.region && (
+                <p className="error-message">{errors.region}</p>
+              )}
+            </span>
+          </div>
+
+          {/* zipcode section */}
+          <div className="form-group">
+            <label htmlFor="zipCode">
+              Postcode / Zip <span style={{ color: "red" }}>*</span>
+            </label>
+            <input
+              type="number"
+              id="zipCode"
+              value={values.zipCode}
+              onChange={handleChange}
+            />
+            <span>
+              {errors.zipCode && (
+                <p className="error-message">{errors.zipCode}</p>
+              )}
+            </span>
+          </div>
+
+          {/* country section */}
+          <div className="form-group">
+            <label htmlFor="country">
+              Country <span style={{ color: "red" }}>*</span>
+            </label>
+            <select id="country" value={values.country} onChange={handleChange}>
+              <option value="">Select Country</option>
+              <option value="US">United States</option>
+              <option value="UK">United Kingdom</option>
+              <option value="CA">Canada</option>
+            </select>
+            <span>
+              {" "}
+              {errors.country && (
+                <p className="error-message">{errors.country}</p>
+              )}
+            </span>
+          </div>
+          <button type="submit">Register</button>
+        </form>
+      </div>
     </div>
   );
 };

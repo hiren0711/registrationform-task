@@ -1,5 +1,5 @@
 import RegistrationForm from "./RegistrationForm";
-
+import './style.css';
 
 function App() {
   return (
